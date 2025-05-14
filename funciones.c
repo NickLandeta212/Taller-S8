@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "funciones.h"
 #include <math.h>
 float validarIngreso() {
@@ -21,8 +22,8 @@ int menu(){
     int opc;
     printf("Selecciones una opcion:\n");
     printf("1. Registrar producto\n");
-    printf("2. Precio total del inventario\n");
-    printf("3. Producto mas caro y el mas barato\n");
+    printf("2. Ingrese los ingredientes a utilizar y su cantidad\n");
+    printf("3. Ingrese el pedido\n");
     printf("4. Precio promedio de todos los productos\n");
     printf("5. Busqueda de producto\n");
     printf("6. Salir\n");
@@ -30,27 +31,46 @@ int menu(){
     opc=validarIngreso();
     return opc;
 }
-int Ingreseproductos(char nombres[5][30], int ingredientes[][30],int cantidad[][], int contp, float precio[10]) {
-    int len;
-    if (contp < 10) {
-        
-        printf("Ingrese el nombre del producto %d: ", contp);
+
+int IngresarProductos(char nombres[5][30], int contp) {
+    if (contp < 5) {
+        printf("Ingrese el nombre del producto %d: ", contp + 1);
         fflush(stdin); // Limpiar el buffer de entrada
         fgets(nombres[contp], 30, stdin);
+
         // Elimina el salto de línea al final del nombre
-        len = strlen(nombres[contp]) - 1;
+        int len = strlen(nombres[contp]) - 1;
         if (nombres[contp][len] == '\n') {
             nombres[contp][len] = '\0';
         }
 
-        printf("Ingrese el stock del producto %d: ", contp);
-        stock[contp] = validarIngreso();
-        printf("Ingrese el precio del producto %d: ", contp);
-        precio[contp] = validarIngreso();
+
         contp++;
 
     } else {
-        printf("No se pueden ingresar más productos. El límite es 10.\n");
+        printf("No se pueden ingresar más productos. El límite es 5.\n");
     }
+
     return contp;
+}
+
+void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int *contador) {
+    if (*contador < 10) {
+        printf("Ingrese el nombre del ingrediente %d: ", *contador + 1);
+        fflush(stdin);
+        fgets(ingredientes[*contador], 30, stdin);
+
+        // Eliminar salto de línea
+        int len = strlen(ingredientes[*contador]) - 1;
+        if (ingredientes[*contador][len] == '\n') {
+            ingredientes[*contador][len] = '\0';
+        }
+
+        printf("Ingrese la cantidad del ingrediente %d: ", *contador + 1);
+        cantidades[*contador] = validarIngreso();
+
+        (*contador)++;
+    } else {
+        printf("No se pueden ingresar más ingredientes. Límite alcanzado.\n");
+    }
 }
