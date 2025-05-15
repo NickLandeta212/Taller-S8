@@ -16,10 +16,10 @@ int main() {
 
         switch (opcion) {
             case 1:
-                contProductos = IngresarProductos(productos, cantidadesPorProducto, ingredientes, contIngredientes, contProductos);
+                RegistrarIngredientes(ingredientes, cantidades, &contIngredientes);
                 break;
             case 2:
-                RegistrarIngredientes(ingredientes, cantidades, &contIngredientes);
+                contProductos = IngresarProductos(productos, cantidadesPorProducto, ingredientes, contIngredientes, contProductos);
                 break;
             case 3:
                 RealizarPedido(ingredientes, cantidades, contIngredientes);

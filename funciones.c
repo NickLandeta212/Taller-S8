@@ -21,8 +21,8 @@ float validarIngreso() {
 int menu(){
     int opc;
     printf("Selecciones una opcion:\n");
-    printf("1. Registrar producto\n");
-    printf("2. Ingrese los ingredientes a utilizar y su cantidad\n");
+    printf("1. Ingrese los ingredientes y su cantidad\n");
+    printf("2. Registrar producto\n");
     printf("3. Ingrese el pedido\n");
     printf("4. Precio promedio de todos los productos\n");
     printf("5. Busqueda de producto\n");
@@ -31,56 +31,6 @@ int menu(){
     opc=validarIngreso();
     return opc;
 }
-
-int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], char ingredientes[10][30], int contIngredientes, int contp) {
-    if (contp < 5) {
-        printf("Ingrese el nombre del producto %d: ", contp + 1);
-        fflush(stdin);
-        fgets(nombres[contp], 30, stdin);
-
-        // Eliminar salto de línea
-        int len = strlen(nombres[contp]) - 1;
-        if (nombres[contp][len] == '\n') {
-            nombres[contp][len] = '\0';
-        }
-
-        printf("¿Cuántos ingredientes necesita '%s'? ", nombres[contp]);
-        int numIng = (int)validarIngreso();
-
-        for (int i = 0; i < numIng; i++) {
-            char nombreIng[30];
-            printf("Ingrese el nombre del ingrediente %d: ", i + 1);
-            fflush(stdin);
-            fgets(nombreIng, 30, stdin);
-            int lenIng = strlen(nombreIng) - 1;
-            if (nombreIng[lenIng] == '\n') nombreIng[lenIng] = '\0';
-
-            // Buscar el ingrediente en la lista global
-            int encontrado = -1;
-            for (int j = 0; j < contIngredientes; j++) {
-                if (strcmp(nombreIng, ingredientes[j]) == 0) {
-                    encontrado = j;
-                    break;
-                }
-            }
-
-            if (encontrado != -1) {
-                printf("Ingrese la cantidad necesaria de %s: ", nombreIng);
-                float cantidad = validarIngreso();
-                *(*(cantidadesPorProducto + contp) + encontrado) = cantidad;
-            } else {
-                printf("Ingrediente '%s' no encontrado. Debe registrarlo primero.\n", nombreIng);
-            }
-        }
-
-        contp++;
-    } else {
-        printf("No se pueden ingresar más productos. El límite es 5.\n");
-    }
-
-    return contp;
-}
-
 
 void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int *contador) {
     if (*contador < 10) {
@@ -99,8 +49,59 @@ void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int 
 
         (*contador)++;
     } else {
-        printf("No se pueden ingresar más ingredientes. Límite alcanzado.\n");
+        printf("No se pueden ingresar mas ingredientes. Limite alcanzado.\n");
     }
+}
+int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], char ingredientes[10][30], int contIngredientes, int contp) {
+    if (contp < 5) {
+        printf("Ingrese el nombre del producto %d: ", contp + 1);
+        fflush(stdin);
+        fgets(nombres[contp], 30, stdin);
+
+        // Eliminar salto de línea
+        int len = strlen(nombres[contp]) - 1;
+        if (nombres[contp][len] == '\n') {
+            nombres[contp][len] = '\0';
+        }
+
+        printf("¿Cuántos ingredientes necesita '%s'? ", nombres[contp]);
+        int numIng = (int)validarIngreso();
+
+        for (int i = 0; i < numIng; i++) {
+            int encontrado = -1;
+            char nombreIng[30];
+
+            // Repetir hasta que se ingrese un ingrediente válido
+            while (encontrado == -1) {
+                printf("Ingrese el nombre del ingrediente %d: ", i + 1);
+                fflush(stdin);
+                fgets(nombreIng, 30, stdin);
+                int lenIng = strlen(nombreIng) - 1;
+                if (nombreIng[lenIng] == '\n') nombreIng[lenIng] = '\0';
+
+                for (int j = 0; j < contIngredientes; j++) {
+                    if (strcmp(nombreIng, ingredientes[j]) == 0) {
+                        encontrado = j;
+                        break;
+                    }
+                }
+
+                if (encontrado == -1) {
+                    printf("Ingrediente '%s' no encontrado. Debe ingresar un ingrediente ya registrado.\n", nombreIng);
+                }
+            }
+
+            printf("Ingrese la cantidad necesaria de %s: ", nombreIng);
+            float cantidad = validarIngreso();
+            *(*(cantidadesPorProducto + contp) + encontrado) = cantidad;
+        }
+
+        contp++;
+    } else {
+        printf("No se pueden ingresar más productos. El límite es 5.\n");
+    }
+
+    return contp;
 }
 
 void RealizarPedido(char ingredientes[10][30], float cantidades[10], int contador) {
