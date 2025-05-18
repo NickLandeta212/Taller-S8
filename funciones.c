@@ -36,8 +36,6 @@ void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int 
         printf("Ingrese el nombre del ingrediente %d: ", *contador + 1);
         fflush(stdin);
         fgets(ingredientes[*contador], 30, stdin);
-
-        // Eliminar salto de línea
         int len = strlen(ingredientes[*contador]) - 1;
         if (ingredientes[*contador][len] == '\n') {
             ingredientes[*contador][len] = '\0';
@@ -53,67 +51,64 @@ void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int 
 }
 
 int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], char ingredientes[10][30], int contIngredientes, int contp) {
-    if (contp < 5) {
-        printf("Ingrese el nombre del producto %d: ", contp + 1);
-        fflush(stdin);
-        fgets(nombres[contp], 30, stdin);
+    if (contp >= 5) {
+        printf("No se pueden ingresar más productos. El límite es 5.\n");
+        return contp;
+    }
 
-        // Eliminar salto de línea
-        int len = strlen(nombres[contp]) - 1;
-        if (nombres[contp][len] == '\n') {
-            nombres[contp][len] = '\0';
-        }
+    printf("Ingrese el nombre del producto %d: ", contp + 1);
+    fflush(stdin);
+    fgets(nombres[contp], 30, stdin);
 
-        printf("¿Cuántos ingredientes necesita '%s'? ", nombres[contp]);
-        int numIng = (int)validarIngreso();
+    int len = strlen(nombres[contp]) - 1;
+    if (nombres[contp][len] == '\n') {
+        nombres[contp][len] = '\0';
+    }
 
-        for (int i = 0; i < numIng; i++) {
-            int encontrado = -1;
-            char nombreIng[30];
+    printf("¿Cuantos ingredientes necesita '%s'? ", nombres[contp]);
+    int numIng = (int)validarIngreso();
 
-            // Repetir hasta que se ingrese un ingrediente válido
-            while (encontrado == -1) {
-                printf("Ingrese el nombre del ingrediente %d: ", i + 1);
-                fflush(stdin);
-                fgets(nombreIng, 30, stdin);
-                int lenIng = strlen(nombreIng) - 1;
-                if (nombreIng[lenIng] == '\n') nombreIng[lenIng] = '\0';
+    for (int i = 0; i < numIng; i++) {
+        int encontrado = -1;
+        char nombreIng[30];
 
-                for (int j = 0; j < contIngredientes; j++) {
-                    if (strcmp(nombreIng, ingredientes[j]) == 0) {
-                        encontrado = j;
-                        break;
-                    }
-                }
+        while (encontrado == -1) {
+            printf("Ingrese el nombre del ingrediente %d: ", i + 1);
+            fflush(stdin);
+            fgets(nombreIng, 30, stdin);
+            int lenIng = strlen(nombreIng) - 1;
+            if (nombreIng[lenIng] == '\n') nombreIng[lenIng] = '\0';
 
-                if (encontrado == -1) {
-                    printf("Ingrediente '%s' no encontrado. Debe ingresar un ingrediente ya registrado.\n", nombreIng);
+            for (int j = 0; j < contIngredientes; j++) {
+                if (strcmp(nombreIng, ingredientes[j]) == 0) {
+                    encontrado = j;
+                    break;
                 }
             }
 
-            printf("Ingrese la cantidad necesaria de %s: ", nombreIng);
-            float cantidad = validarIngreso();
-            *(*(cantidadesPorProducto + contp) + encontrado) = cantidad;
+            if (encontrado == -1) {
+                printf("Ingrediente '%s' no encontrado. Debe ingresar un ingrediente ya registrado.\n", nombreIng);
+            }
         }
 
-        contp++;
-    } else {
-        printf("No se pueden ingresar más productos. El límite es 5.\n");
+        printf("Ingrese la cantidad necesaria de %s: ", nombreIng);
+        float cantidad = validarIngreso();
+        cantidadesPorProducto[contp][encontrado] = cantidad;
     }
 
-    return contp;
+    return contp + 1;
 }
+
 float validarTiempo() {
     float tiempo;
     do {
-        printf("Ingrese el tiempo estimado de producción (en minutos): ");
+        printf("Ingrese el tiempo estimado de produccion (en minutos): ");
         tiempo = validarIngreso();
         
-        if (tiempo < 10) {  // Ejemplo: Establecer un tiempo mínimo
+        if (tiempo < 5) { 
             printf("El tiempo ingresado es muy corto. Ingrese un tiempo mayor.\n");
         }
-    } while (tiempo < 10); // Si el tiempo es insuficiente, se solicita otro
-    
+    } while (tiempo < 5); 
     return tiempo;
 }
 
@@ -201,7 +196,7 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
 
     char continuar = 's';
     while (continuar == 's' || continuar == 'S') {
-        // Mostrar tabla de productos e ingredientes
+   
         printf("\n%-20s%-20s%-20s%-20s\n", "Producto", "Ingrediente", "Stock Disponible", "Tiempo Producción");
         printf("--------------------------------------------------------------------------\n");
 
@@ -213,7 +208,6 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
             }
         }
 
-        // Selección del producto
         char nombreProducto[30];
         int productoIndex = -1;
         printf("\nIngrese el nombre del producto que desea pedir: ");
@@ -234,14 +228,12 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
             continue;
         }
 
-        // Cantidad y tiempo estimado
         int cantidadPedido;
         printf("Ingrese la cantidad de productos que desea: ");
         cantidadPedido = (int)validarIngreso();
 
         ValidarTiempoPedido(tiemposProduccion, productoIndex, &cantidadPedido);
 
-        // Verificar si hay suficientes ingredientes
         int suficientes = 1;
         for (int j = 0; j < numIngredientes; j++) {
             float requerido = cantidadesPorProducto[productoIndex][j] * cantidadPedido;
@@ -265,8 +257,6 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
                 break;
             }
         }
-
-        // Confirmación del pedido
         char confirmar;
         printf("¿Desea confirmar el pedido de %d unidades de %s? (s/n): ", cantidadPedido, nombreProducto);
         fflush(stdin);
