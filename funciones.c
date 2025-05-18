@@ -23,10 +23,9 @@ int menu(){
     printf("Selecciones una opcion:\n");
     printf("1. Ingrese los ingredientes y su cantidad\n");
     printf("2. Registrar producto\n");
-    printf("3. Ingrese el pedido\n");
-    printf("4. Precio promedio de todos los productos\n");
-    printf("5. Busqueda de producto\n");
-    printf("6. Salir\n");
+    printf("3. Ingrese tiempo estimado por producto\n");
+    printf("4. Ingrese el pedido\n");
+    printf("5. Salir\n");
     printf(">> ");
     opc=validarIngreso();
     return opc;
@@ -52,6 +51,7 @@ void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int 
         printf("No se pueden ingresar mas ingredientes. Limite alcanzado.\n");
     }
 }
+
 int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], char ingredientes[10][30], int contIngredientes, int contp) {
     if (contp < 5) {
         printf("Ingrese el nombre del producto %d: ", contp + 1);
@@ -103,56 +103,187 @@ int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], c
 
     return contp;
 }
-
-void RealizarPedido(char ingredientes[10][30], float cantidades[10], int contador) {
-    if (contador == 0) {
-        printf("No hay ingredientes registrados para realizar un pedido.\n");
-        return;
-    }
-
-    printf("\n--- Ingredientes disponibles ---\n");
-    for (int i = 0; i < contador; i++) {
-        printf("%d. %s - %.2f unidades\n", i + 1, ingredientes[i], cantidades[i]);
-    }
-
-    char nombre[30];
-    float cantidadSolicitada;
-    char continuar;
-
+float validarTiempo() {
+    float tiempo;
     do {
-        printf("\nIngrese el nombre del ingrediente que desea usar: ");
+        printf("Ingrese el tiempo estimado de producción (en minutos): ");
+        tiempo = validarIngreso();
+        
+        if (tiempo < 10) {  // Ejemplo: Establecer un tiempo mínimo
+            printf("El tiempo ingresado es muy corto. Ingrese un tiempo mayor.\n");
+        }
+    } while (tiempo < 10); // Si el tiempo es insuficiente, se solicita otro
+    
+    return tiempo;
+}
+
+void RegistrarTiempoProduccion(float *tiemposProduccion, int contp) {
+    printf("Ingrese el tiempo estimado de producción (en segundos) para el producto %d: ", contp + 1);
+    tiemposProduccion[contp] = validarIngreso();
+}
+void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *cantidadPedido) {
+    float tiempoIngresado;
+    
+    printf("Ingrese el tiempo estimado para producir %d unidades del producto: ", *cantidadPedido);
+    tiempoIngresado = validarIngreso();
+
+    while (tiempoIngresado < (*cantidadPedido * tiemposProduccion[productoIndex])) {
+        printf("El tiempo ingresado es insuficiente para producir %d unidades.\n", *cantidadPedido);
+        printf("Opciones:\n");
+        printf("1. Aumentar el tiempo de producción\n");
+        printf("2. Disminuir la cantidad de productos\n");
+        printf("Seleccione una opción: ");
+        
+        int opcion = (int)validarIngreso();
+        if (opcion == 1) {
+            printf("Ingrese un nuevo tiempo estimado: ");
+            tiempoIngresado = validarIngreso();
+        } else if (opcion == 2) {
+            printf("Ingrese una nueva cantidad de productos: ");
+            *cantidadPedido = (int)validarIngreso();
+        } else {
+            printf("Opción inválida.\n");
+        }
+    }
+    
+    printf("Tiempo de producción validado. Procediendo con el pedido.\n");
+}
+
+void RellenarInventario(char ingredientes[10][30], float *stock, int numIngredientes) {
+    char continuar = 's';
+
+    while (continuar == 's' || continuar == 'S') {
+        printf("\n--- Inventario Actual ---\n");
+        for (int i = 0; i < numIngredientes; i++) {
+            printf("%d. %s - %.2f unidades\n", i + 1, ingredientes[i], stock[i]);
+        }
+
+        printf("\nIngrese el nombre del ingrediente que desea reabastecer: ");
+        char nombre[30];
         fflush(stdin);
         fgets(nombre, 30, stdin);
+
         int len = strlen(nombre) - 1;
         if (nombre[len] == '\n') {
             nombre[len] = '\0';
         }
 
-        int encontrado = 0;
-        for (int i = 0; i < contador; i++) {
+        int encontrado = -1;
+        for (int i = 0; i < numIngredientes; i++) {
             if (strcmp(nombre, ingredientes[i]) == 0) {
-                encontrado = 1;
-                printf("Ingrese la cantidad que desea usar de %s: ", nombre);
-                cantidadSolicitada = validarIngreso();
-
-                if (cantidadSolicitada <= cantidades[i]) {
-                    cantidades[i] -= cantidadSolicitada;
-                    printf("Pedido realizado: %.2f unidades de %s\n", cantidadSolicitada, nombre);
-                } else {
-                    printf("No hay suficiente cantidad disponible. Solo hay %.2f unidades.\n", cantidades[i]);
-                }
+                encontrado = i;
                 break;
             }
         }
 
-        if (!encontrado) {
+        if (encontrado != -1) {
+            printf("Ingrese la cantidad a agregar para %s: ", ingredientes[encontrado]);
+            float cantidad = validarIngreso();
+            stock[encontrado] += cantidad;
+            printf("Inventario actualizado: %s ahora tiene %.2f unidades.\n", ingredientes[encontrado], stock[encontrado]);
+        } else {
             printf("Ingrediente no encontrado.\n");
         }
 
-        printf("¿Desea pedir otro ingrediente? (s/n): ");
+        printf("\n¿Desea agregar stock a otro ingrediente? (s/n): ");
         fflush(stdin);
         scanf(" %c", &continuar);
+    }
 
-    } while (continuar == 's' || continuar == 'S');
+    printf("Inventario actualizado correctamente.\n");
+}
+
+void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],char ingredientes[10][30],float stock[10],float tiemposProduccion[5],int numProductos,int numIngredientes) {
+    if (numIngredientes == 0 || numProductos == 0) {
+        printf("No hay ingredientes o productos registrados para realizar un pedido.\n");
+        return;
+    }
+
+    char continuar = 's';
+    while (continuar == 's' || continuar == 'S') {
+        // Mostrar tabla de productos e ingredientes
+        printf("\n%-20s%-20s%-20s%-20s\n", "Producto", "Ingrediente", "Stock Disponible", "Tiempo Producción");
+        printf("--------------------------------------------------------------------------\n");
+
+        for (int i = 0; i < numProductos; i++) {
+            for (int j = 0; j < numIngredientes; j++) {
+                if (cantidadesPorProducto[i][j] > 0) {
+                    printf("%-20s%-20s%-20.2f%-20.2f segundos\n", productos[i], ingredientes[j], stock[j], tiemposProduccion[i]);
+                }
+            }
+        }
+
+        // Selección del producto
+        char nombreProducto[30];
+        int productoIndex = -1;
+        printf("\nIngrese el nombre del producto que desea pedir: ");
+        fflush(stdin);
+        fgets(nombreProducto, 30, stdin);
+        int len = strlen(nombreProducto) - 1;
+        if (nombreProducto[len] == '\n') nombreProducto[len] = '\0';
+
+        for (int i = 0; i < numProductos; i++) {
+            if (strcmp(nombreProducto, productos[i]) == 0) {
+                productoIndex = i;
+                break;
+            }
+        }
+
+        if (productoIndex == -1) {
+            printf("Producto no encontrado.\n");
+            continue;
+        }
+
+        // Cantidad y tiempo estimado
+        int cantidadPedido;
+        printf("Ingrese la cantidad de productos que desea: ");
+        cantidadPedido = (int)validarIngreso();
+
+        ValidarTiempoPedido(tiemposProduccion, productoIndex, &cantidadPedido);
+
+        // Verificar si hay suficientes ingredientes
+        int suficientes = 1;
+        for (int j = 0; j < numIngredientes; j++) {
+            float requerido = cantidadesPorProducto[productoIndex][j] * cantidadPedido;
+            if (requerido > stock[j]) {
+                suficientes = 0;
+                break;
+            }
+        }
+
+        if (!suficientes) {
+            printf("Ingredientes insuficientes para realizar el pedido.\n");
+            char opcion;
+            printf("¿Desea reabastecer el inventario? (s/n): ");
+            fflush(stdin);
+            scanf(" %c", &opcion);
+            if (opcion == 's' || opcion == 'S') {
+                RellenarInventario(ingredientes, stock, numIngredientes);
+                continue;
+            } else {
+                printf("Pedido cancelado.\n");
+                break;
+            }
+        }
+
+        // Confirmación del pedido
+        char confirmar;
+        printf("¿Desea confirmar el pedido de %d unidades de %s? (s/n): ", cantidadPedido, nombreProducto);
+        fflush(stdin);
+        scanf(" %c", &confirmar);
+
+        if (confirmar == 's' || confirmar == 'S') {
+            for (int j = 0; j < numIngredientes; j++) {
+                stock[j] -= cantidadesPorProducto[productoIndex][j] * cantidadPedido;
+            }
+            printf("Pedido confirmado y procesado con éxito.\n");
+        } else {
+            printf("Pedido cancelado por el usuario.\n");
+        }
+
+        printf("\n¿Desea realizar otro pedido? (s/n): ");
+        fflush(stdin);
+        scanf(" %c", &continuar);
+    }
 }
 
