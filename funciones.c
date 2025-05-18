@@ -10,7 +10,7 @@ float validarIngreso() {
      val = scanf("%f", &a);
      if (val != 1) {
      printf("Se ingreso un valor erroneo. Ingrese nuevamente:\n");
-     while (getchar() != '\n'); // Limpiar el buffer de entrada
+     while (getchar() != '\n'); 
     } else if (a < 0) {
     printf("Ingrese un valor positivo:");
     }
@@ -52,7 +52,7 @@ void RegistrarIngredientes(char ingredientes[10][30], float cantidades[10], int 
 
 int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], char ingredientes[10][30], int contIngredientes, int contp) {
     if (contp >= 5) {
-        printf("No se pueden ingresar más productos. El limite es 5.\n");
+        printf("No se pueden ingresar mas productos. El limite es 5.\n");
         return contp;
     }
 
@@ -111,11 +111,11 @@ void RegistrarTiempoProduccion(char productos[5][30], float *tiemposProduccion, 
     }
 
     int seleccion;
-    printf("Seleccione el número del producto al que desea asignar tiempo de produccion: ");
+    printf("Seleccione el numero del producto al que desea asignar tiempo de produccion: ");
     seleccion = (int)validarIngreso();
 
     if (seleccion < 1 || seleccion > contp) {
-        printf("Selección invalida.\n");
+        printf("Seleccion invalida.\n");
         return;
     }
 
@@ -123,7 +123,7 @@ void RegistrarTiempoProduccion(char productos[5][30], float *tiemposProduccion, 
     float tiempoMin;
 
     do {
-        printf("Ingrese el tiempo estimado de producción (en minutos) para '%s': ", productos[index]);
+        printf("Ingrese el tiempo estimado de produccion (en minutos) para '%s': ", productos[index]);
         tiempoMin = validarIngreso();
 
         if (tiempoMin < 0.1) {
@@ -175,9 +175,9 @@ void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *canti
     while (tiempoIngresado < (*cantidadPedido * tiemposProduccion[productoIndex])) {
         printf("El tiempo ingresado es insuficiente para producir %d unidades.\n", *cantidadPedido);
         printf("Opciones:\n");
-        printf("1. Aumentar el tiempo de producción\n");
+        printf("1. Aumentar el tiempo de produccion\n");
         printf("2. Disminuir la cantidad de productos\n");
-        printf("Seleccione una opción: ");
+        printf("Seleccione una opcion: ");
         
         int opcion = (int)validarIngreso();
         if (opcion == 1) {
@@ -187,11 +187,11 @@ void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *canti
             printf("Ingrese una nueva cantidad de productos: ");
             *cantidadPedido = (int)validarIngreso();
         } else {
-            printf("Opción inválida.\n");
+            printf("Opción invalida.\n");
         }
     }
     
-    printf("Tiempo de producción validado. Procediendo con el pedido.\n");
+    printf("Tiempo de produccion validado. Procediendo con el pedido.\n");
 }
 void RealizarPedido(char productos[5][30], float cantidadesPorProducto[5][10],char ingredientes[10][30],float stock[10],
                     float tiemposProduccion[5],int numProductos,int numIngredientes) {
