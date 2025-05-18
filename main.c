@@ -27,11 +27,7 @@ int main() {
                 break;
 
             case 3:
-                if (contProductos > 0) {
-                    RegistrarTiempoProduccion(tiemposProduccion, contProductos - 1);
-                } else {
-                    printf("Debe registrar al menos un producto antes de asignar tiempo de producción.\n");
-                }
+                RegistrarTiempoProduccion(productos, tiemposProduccion, contProductos);
                 break;
 
             case 4:
