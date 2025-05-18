@@ -99,50 +99,42 @@ int IngresarProductos(char nombres[5][30], float (*cantidadesPorProducto)[10], c
     return contp + 1;
 }
 
-float validarTiempo() {
-    float tiempo;
-    do {
-        printf("Ingrese el tiempo estimado de produccion (en minutos): ");
-        tiempo = validarIngreso();
-        
-        if (tiempo < 5) { 
-            printf("El tiempo ingresado es muy corto. Ingrese un tiempo mayor.\n");
-        }
-    } while (tiempo < 5); 
-    return tiempo;
-}
-
-void RegistrarTiempoProduccion(float *tiemposProduccion, int contp) {
-    printf("Ingrese el tiempo estimado de producción (en segundos) para el producto %d: ", contp + 1);
-    tiemposProduccion[contp] = validarIngreso();
-}
-void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *cantidadPedido) {
-    float tiempoIngresado;
-    
-    printf("Ingrese el tiempo estimado para producir %d unidades del producto: ", *cantidadPedido);
-    tiempoIngresado = validarIngreso();
-
-    while (tiempoIngresado < (*cantidadPedido * tiemposProduccion[productoIndex])) {
-        printf("El tiempo ingresado es insuficiente para producir %d unidades.\n", *cantidadPedido);
-        printf("Opciones:\n");
-        printf("1. Aumentar el tiempo de producción\n");
-        printf("2. Disminuir la cantidad de productos\n");
-        printf("Seleccione una opción: ");
-        
-        int opcion = (int)validarIngreso();
-        if (opcion == 1) {
-            printf("Ingrese un nuevo tiempo estimado: ");
-            tiempoIngresado = validarIngreso();
-        } else if (opcion == 2) {
-            printf("Ingrese una nueva cantidad de productos: ");
-            *cantidadPedido = (int)validarIngreso();
-        } else {
-            printf("Opción inválida.\n");
-        }
+void RegistrarTiempoProduccion(char productos[5][30], float *tiemposProduccion, int contp) {
+    if (contp == 0) {
+        printf("No hay productos registrados aún.\n");
+        return;
     }
-    
-    printf("Tiempo de producción validado. Procediendo con el pedido.\n");
+
+    printf("\n--- Productos Registrados ---\n");
+    for (int i = 0; i < contp; i++) {
+        printf("%d. %s\n", i + 1, productos[i]);
+    }
+
+    int seleccion;
+    printf("Seleccione el número del producto al que desea asignar tiempo de producción: ");
+    seleccion = (int)validarIngreso();
+
+    if (seleccion < 1 || seleccion > contp) {
+        printf("Selección inválida.\n");
+        return;
+    }
+
+    int index = seleccion - 1;
+    float tiempoMin;
+
+    do {
+        printf("Ingrese el tiempo estimado de producción (en minutos) para '%s': ", productos[index]);
+        tiempoMin = validarIngreso();
+
+        if (tiempoMin < 0.1) {
+            printf("El tiempo ingresado es muy corto. Ingrese un tiempo mayor a 0.1 minutos.\n");
+        }
+    } while (tiempoMin < 0.1);
+
+    tiemposProduccion[index] = tiempoMin * 60; // Convertir a segundos
+    printf("Tiempo registrado correctamente para '%s' (%.2f minutos).\n", productos[index], tiempoMin);
 }
+
 
 void RellenarInventario(char ingredientes[10][30], float *stock, int numIngredientes) {
     char continuar = 's';
@@ -187,7 +179,33 @@ void RellenarInventario(char ingredientes[10][30], float *stock, int numIngredie
 
     printf("Inventario actualizado correctamente.\n");
 }
+void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *cantidadPedido) {
+    float tiempoIngresado;
+    
+    printf("Ingrese el tiempo estimado para producir %d unidades del producto: ", *cantidadPedido);
+    tiempoIngresado = validarIngreso();
 
+    while (tiempoIngresado < (*cantidadPedido * tiemposProduccion[productoIndex])) {
+        printf("El tiempo ingresado es insuficiente para producir %d unidades.\n", *cantidadPedido);
+        printf("Opciones:\n");
+        printf("1. Aumentar el tiempo de producción\n");
+        printf("2. Disminuir la cantidad de productos\n");
+        printf("Seleccione una opción: ");
+        
+        int opcion = (int)validarIngreso();
+        if (opcion == 1) {
+            printf("Ingrese un nuevo tiempo estimado: ");
+            tiempoIngresado = validarIngreso();
+        } else if (opcion == 2) {
+            printf("Ingrese una nueva cantidad de productos: ");
+            *cantidadPedido = (int)validarIngreso();
+        } else {
+            printf("Opción inválida.\n");
+        }
+    }
+    
+    printf("Tiempo de producción validado. Procediendo con el pedido.\n");
+}
 void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],char ingredientes[10][30],float stock[10],float tiemposProduccion[5],int numProductos,int numIngredientes) {
     if (numIngredientes == 0 || numProductos == 0) {
         printf("No hay ingredientes o productos registrados para realizar un pedido.\n");
