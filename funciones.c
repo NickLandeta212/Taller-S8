@@ -131,10 +131,9 @@ void RegistrarTiempoProduccion(char productos[5][30], float *tiemposProduccion, 
         }
     } while (tiempoMin < 0.1);
 
-    tiemposProduccion[index] = tiempoMin * 60; // Convertir a segundos
+    tiemposProduccion[index] = tiempoMin; 
     printf("Tiempo registrado correctamente para '%s' (%.2f minutos).\n", productos[index], tiempoMin);
 }
-
 
 void RellenarInventario(char ingredientes[10][30], float *stock, int numIngredientes) {
     char continuar = 's';
@@ -206,7 +205,8 @@ void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *canti
     
     printf("Tiempo de producción validado. Procediendo con el pedido.\n");
 }
-void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],char ingredientes[10][30],float stock[10],float tiemposProduccion[5],int numProductos,int numIngredientes) {
+void RealizarPedido(char productos[5][30], float cantidadesPorProducto[5][10],char ingredientes[10][30],float stock[10],
+                    float tiemposProduccion[5],int numProductos,int numIngredientes) {
     if (numIngredientes == 0 || numProductos == 0) {
         printf("No hay ingredientes o productos registrados para realizar un pedido.\n");
         return;
@@ -214,16 +214,29 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
 
     char continuar = 's';
     while (continuar == 's' || continuar == 'S') {
-   
-        printf("\n%-20s%-20s%-20s%-20s\n", "Producto", "Ingrediente", "Stock Disponible", "Tiempo Producción");
-        printf("--------------------------------------------------------------------------\n");
+
+        printf("\n--- Tabla de Ingredientes ---\n");
+        printf("%-20s%-20s\n", "Ingrediente", "Stock Disponible");
+        printf("------------------------------------------\n");
+        for (int i = 0; i < numIngredientes; i++) {
+            printf("%-20s%-20.2f\n", ingredientes[i], stock[i]);
+        }
+
+       
+        printf("\n--- Tabla de Productos ---\n");
+        printf("%-15s", "Producto");
+        for (int j = 0; j < numIngredientes; j++) {
+            printf("%-10s", ingredientes[j]);
+        }
+        printf("%-15s\n", "Tiempo (min)");
+        printf("--------------------------------------------------------------------------------\n");
 
         for (int i = 0; i < numProductos; i++) {
+            printf("%-15s", productos[i]);
             for (int j = 0; j < numIngredientes; j++) {
-                if (cantidadesPorProducto[i][j] > 0) {
-                    printf("%-20s%-20s%-20.2f%-20.2f segundos\n", productos[i], ingredientes[j], stock[j], tiemposProduccion[i]);
-                }
+                printf("%-10.2f", cantidadesPorProducto[i][j]);
             }
+            printf("%-15.2f\n", tiemposProduccion[i]); 
         }
 
         char nombreProducto[30];
@@ -251,7 +264,6 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
         cantidadPedido = (int)validarIngreso();
 
         ValidarTiempoPedido(tiemposProduccion, productoIndex, &cantidadPedido);
-
         int suficientes = 1;
         for (int j = 0; j < numIngredientes; j++) {
             float requerido = cantidadesPorProducto[productoIndex][j] * cantidadPedido;
@@ -281,8 +293,13 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
         scanf(" %c", &confirmar);
 
         if (confirmar == 's' || confirmar == 'S') {
+            printf("\n--- Ingredientes descontados del inventario ---\n");
             for (int j = 0; j < numIngredientes; j++) {
-                stock[j] -= cantidadesPorProducto[productoIndex][j] * cantidadPedido;
+                float requerido = cantidadesPorProducto[productoIndex][j] * cantidadPedido;
+                if (requerido > 0) {
+                    stock[j] -= requerido;
+                    printf("%-20s: -%.2f unidades (restante: %.2f)\n", ingredientes[j], requerido, stock[j]);
+                }
             }
             printf("Pedido confirmado y procesado con éxito.\n");
         } else {
@@ -294,4 +311,5 @@ void RealizarPedido(char productos[5][30],float cantidadesPorProducto[5][10],cha
         scanf(" %c", &continuar);
     }
 }
+
 
