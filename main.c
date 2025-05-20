@@ -4,45 +4,47 @@
 
 int main() {
     char ingredientes[10][30];
-    float stock[10] = {0};
+    float cantidades[10];
     int contIngredientes = 0;
 
-    char productos[5][30];
+    char nombres[5][30];
     float cantidadesPorProducto[5][10] = {0};
+    int contp = 0;
+
     float tiemposProduccion[5] = {0};
-    int contProductos = 0;
+    float stock[10] = {0};
 
     int opcion;
 
     do {
         opcion = menu();
-
         switch (opcion) {
             case 1:
-                RegistrarIngredientes(ingredientes, stock, &contIngredientes);
+                RegistrarIngredientes(ingredientes, cantidades, &contIngredientes);
                 break;
-
             case 2:
-                contProductos = IngresarProductos(productos, cantidadesPorProducto, ingredientes, contIngredientes, contProductos);
+                contp = IngresarProductos(nombres, cantidadesPorProducto, ingredientes, contIngredientes, contp);
                 break;
-
             case 3:
-                RegistrarTiempoProduccion(productos, tiemposProduccion, contProductos);
+                RegistrarTiempoProduccion(nombres, tiemposProduccion, contp);
                 break;
-
             case 4:
-                RealizarPedido(productos, cantidadesPorProducto, ingredientes, stock, tiemposProduccion, contProductos, contIngredientes);
+                RealizarPedido(nombres, cantidadesPorProducto, ingredientes, stock, tiemposProduccion, contp, contIngredientes);
                 break;
-
             case 5:
-                printf("Saliendo del programa...\n");
+                EditarProducto(nombres, cantidadesPorProducto, contp);
                 break;
-
+            case 6:
+                EliminarProducto(nombres, cantidadesPorProducto, &contp);
+                break;
+            case 7:
+                printf("Saliendo del programa.\n");
+                break;
             default:
-                printf("Opción inválida. Intente nuevamente.\n");
+                printf("Opcion invalida. Intente nuevamente.\n");
+                break;
         }
-
-    } while (opcion != 5);
+    } while (opcion != 7);
 
     return 0;
 }
