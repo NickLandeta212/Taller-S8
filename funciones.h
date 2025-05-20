@@ -7,3 +7,6 @@ void ValidarTiempoPedido(float *tiemposProduccion, int productoIndex, int *canti
 void RellenarInventario(char ingredientes[][30], float *stock, int numIngredientes);
 void RealizarPedido(char productos[][30], float cantidadesPorProducto[][10], char ingredientes[][30], float stock[10],
                     float tiemposProduccion[5], int numProductos, int numIngredientes);
+void EditarProductoOIngrediente(char ingredientes[][30], float cantidades[10], int numIngredientes,char productos[][30],
+                              float cantidadesPorProducto[][10], int numProductos);                   
+int EliminarProducto(char productos[][30], float cantidadesPorProducto[][10], float tiemposProduccion[5], int numProductos);

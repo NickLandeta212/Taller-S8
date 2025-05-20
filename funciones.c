@@ -316,3 +316,73 @@ void RealizarPedido(char productos[5][30], float cantidadesPorProducto[5][10], c
         printf("Pedido cancelado por el usuario.\n");
     }
 }
+void EditarProductoOIngrediente(char ingredientes[10][30], float cantidades[10], int numIngredientes,
+                                char productos[5][30], float cantidadesPorProducto[5][10], int numProductos) {
+    int opcion;
+    printf("\n--- Editar ---\n");
+    printf("1. Editar Ingrediente\n");
+    printf("2. Editar Producto\n");
+    printf("Seleccione una opción: ");
+    opcion = (int)validarIngreso();
+
+    if (opcion == 1) {
+        printf("\n--- Ingredientes ---\n");
+        for (int i = 0; i < numIngredientes; i++) {
+            printf("%d. %s (%.2f unidades)\n", i + 1, ingredientes[i], cantidades[i]);
+        }
+        printf("Seleccione el número del ingrediente a editar: ");
+        int idx = (int)validarIngreso() - 1;
+        if (idx >= 0 && idx < numIngredientes) {
+            printf("Nuevo nombre del ingrediente: ");
+            fflush(stdin);
+            fgets(ingredientes[idx], 30, stdin);
+            int len = strlen(ingredientes[idx]) - 1;
+            if (ingredientes[idx][len] == '\n') ingredientes[idx][len] = '\0';
+            printf("Nueva cantidad: ");
+            cantidades[idx] = validarIngreso();
+        } else {
+            printf("Índice inválido.\n");
+        }
+    } else if (opcion == 2) {
+        printf("\n--- Productos ---\n");
+        for (int i = 0; i < numProductos; i++) {
+            printf("%d. %s\n", i + 1, productos[i]);
+        }
+        printf("Seleccione el número del producto a editar: ");
+        int idx = (int)validarIngreso() - 1;
+        if (idx >= 0 && idx < numProductos) {
+            printf("Nuevo nombre del producto: ");
+            fflush(stdin);
+            fgets(productos[idx], 30, stdin);
+            int len = strlen(productos[idx]) - 1;
+            if (productos[idx][len] == '\n') productos[idx][len] = '\0';
+        } else {
+            printf("Índice inválido.\n");
+        }
+    } else {
+        printf("Opción inválida.\n");
+    }
+}
+
+int EliminarProducto(char productos[5][30], float cantidadesPorProducto[5][10], float tiemposProduccion[5], int numProductos) {
+    printf("\n--- Eliminar Producto ---\n");
+    for (int i = 0; i < numProductos; i++) {
+        printf("%d. %s\n", i + 1, productos[i]);
+    }
+    printf("Seleccione el número del producto a eliminar: ");
+    int idx = (int)validarIngreso() - 1;
+    if (idx >= 0 && idx < numProductos) {
+        for (int i = idx; i < numProductos - 1; i++) {
+            strcpy(productos[i], productos[i + 1]);
+            for (int j = 0; j < 10; j++) {
+                cantidadesPorProducto[i][j] = cantidadesPorProducto[i + 1][j];
+            }
+            tiemposProduccion[i] = tiemposProduccion[i + 1];
+        }
+        printf("Producto eliminado correctamente.\n");
+        return numProductos - 1;
+    } else {
+        printf("Índice inválido.\n");
+        return numProductos;
+    }
+}
