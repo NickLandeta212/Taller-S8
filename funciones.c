@@ -25,7 +25,9 @@ int menu(){
     printf("2. Registrar producto\n");
     printf("3. Ingrese tiempo estimado por producto\n");
     printf("4. Ingrese el pedido\n");
-    printf("5. Salir\n");
+    printf("5. Editar nombre del producto y cantidades\n");
+    printf("6. Eliminacion de productos\n");
+    printf("7. Salir\n");
     printf(">> ");
     opc=validarIngreso();
     return opc;
@@ -287,3 +289,77 @@ void RealizarPedido(char productos[5][30], float cantidadesPorProducto[5][10], c
     }
 }
 
+void EditarProducto(char nombres[5][30], float cantidadesPorProducto[5][10], int contp) {
+    if (contp == 0) {
+        printf("No hay productos registrados aun.\n");
+        return;
+    }
+
+    printf("\n--- Productos Registrados ---\n");
+    for (int i = 0; i < contp; i++) {
+        printf("%d. %s\n", i + 1, nombres[i]);
+    }
+
+    int seleccion;
+    printf("Seleccione el numero del producto que desea editar: ");
+    seleccion = (int)validarIngreso();
+
+    if (seleccion < 1 || seleccion > contp) {
+        printf("Seleccion invalida.\n");
+        return;
+    }
+
+    int index = seleccion - 1;
+    printf("Ingrese el nuevo nombre del producto: ");
+    fflush(stdin);
+    fgets(nombres[index], 30, stdin);
+    int len = strlen(nombres[index]) - 1;
+    if (nombres[index][len] == '\n') {
+        nombres[index][len] = '\0';
+    }
+
+    printf("Ingrese la nueva cantidad de ingredientes para el producto: ");
+    int numIng = (int)validarIngreso();
+
+    for (int i = 0; i < 10; i++) {
+        cantidadesPorProducto[index][i] = 0; // Reiniciar cantidades
+    }
+
+    for (int i = 0; i < numIng; i++) {
+        printf("Ingrese la nueva cantidad del ingrediente %d: ", i + 1);
+        cantidadesPorProducto[index][i] = validarIngreso();
+    }
+
+    printf("Producto editado correctamente.\n");
+}
+void EliminarProducto(char nombres[5][30], float cantidadesPorProducto[5][10], int *contp) {
+    if (*contp == 0) {
+        printf("No hay productos registrados aun.\n");
+        return;
+    }
+
+    printf("\n--- Productos Registrados ---\n");
+    for (int i = 0; i < *contp; i++) {
+        printf("%d. %s\n", i + 1, nombres[i]);
+    }
+
+    int seleccion;
+    printf("Seleccione el numero del producto que desea eliminar: ");
+    seleccion = (int)validarIngreso();
+
+    if (seleccion < 1 || seleccion > *contp) {
+        printf("Seleccion invalida.\n");
+        return;
+    }
+
+    int index = seleccion - 1;
+    for (int i = index; i < *contp - 1; i++) {
+        strcpy(nombres[i], nombres[i + 1]);
+        for (int j = 0; j < 10; j++) {
+            cantidadesPorProducto[i][j] = cantidadesPorProducto[i + 1][j];
+        }
+    }
+
+    (*contp)--;
+    printf("Producto eliminado correctamente.\n");
+}
