@@ -25,7 +25,9 @@ int menu(){
     printf("2. Registrar producto\n");
     printf("3. Ingrese tiempo estimado por producto\n");
     printf("4. Ingrese el pedido\n");
-    printf("5. Salir\n");
+    printf("5. Editar productos o ingredientes\n");
+    printf("6. Eliminar producto\n");
+    printf("7. Salir\n");
     printf(">> ");
     opc=validarIngreso();
     return opc;

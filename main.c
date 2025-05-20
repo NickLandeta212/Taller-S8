@@ -32,8 +32,15 @@ int main() {
                 RealizarPedido(productos, cantidadesPorProducto, ingredientes, stock, tiemposProduccion, contadorProductos, contadorIngredientes);
                 break;
             case 5:
+                EditarProductoOIngrediente(ingredientes, cantidades, contadorIngredientes, productos, cantidadesPorProducto, contadorProductos);
+                break;
+            case 6:
+            contadorProductos = EliminarProducto(productos, cantidadesPorProducto, tiemposProduccion, contadorProductos);
+            break;
+            case 7:
                 printf("Saliendo del programa...\n");
                 break;
+
             default:
                 printf("Opción no válida. Intente nuevamente.\n");
         }
